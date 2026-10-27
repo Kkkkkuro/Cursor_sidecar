@@ -16,7 +16,7 @@ Cursor（Project Shell を含む）がデバイス上の Agent CLI を起動す�
 
 ディスク上のフリート技能として存在し、プラグインカタログの名前ではありません。
 
-**担当ボット：** tinkabot · 插件技能MCP  
+**担当ボット：** Engineering Lead · 工程师  
 **リポジトリ：** [Kkkkkuro/Cursor_sidecar](https://github.com/Kkkkkuro/Cursor_sidecar)
 
 ---

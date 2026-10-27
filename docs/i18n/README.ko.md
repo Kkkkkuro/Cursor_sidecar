@@ -16,7 +16,7 @@ Cursor(Project Shell 포함)가 장치 Agent CLI를 시작해야 할 때, 이 �
 
 디스크 위 플릿 스킬로 존재하며, 플러그인 카탈로그 이름이 아닙니다.
 
-**담당 봇:** tinkabot · 插件技能MCP  
+**담당 봇:** Engineering Lead · 工程师  
 **저장소:** [Kkkkkuro/Cursor_sidecar](https://github.com/Kkkkkuro/Cursor_sidecar)
 
 ---

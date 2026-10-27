@@ -16,7 +16,7 @@ When Cursor — including a Project Shell — needs to start a device agent CLI,
 
 It lives on disk as a fleet skill, not as a plugin catalog entry.
 
-**Owning bot:** tinkabot · 插件技能MCP  
+**Owning bot:** Engineering Lead · 工程师  
 **Repo:** [Kkkkkuro/Cursor_sidecar](https://github.com/Kkkkkuro/Cursor_sidecar)
 
 ---
