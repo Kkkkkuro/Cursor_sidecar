@@ -14,7 +14,24 @@ Stable call path for starting a device agent CLI from Cursor. The caller chooses
 
 Authority is the Shared completion bell, then machine `grokbot-cursor-standing-orders` **#19** and **#23** (and the matching hard rules in the Cursor dispatch template). This skill does not restate Shared. If wording conflicts, Shared wins, then SO #19 and SO #23.
 
-**Shape:** fleet on-disk skill at `~/.cursor/skills/Cursor_sidecar/SKILL.md`, or a copy under the job `RUN_DIR`. It is not a GBrain or plugin catalog name. Briefs and workers must not call `plugin get_skill` or `get_skill` for `Cursor_sidecar` or the retired name `cursor-codex-launch`.
+**Shape:** a complete fleet on-disk skill directory at `~/.cursor/skills/Cursor_sidecar/`, or a complete copy under the job `RUN_DIR`. `SKILL.md` alone is an incomplete install. It is not a GBrain or plugin catalog name. Briefs and workers must not call `plugin get_skill` or `get_skill` for `Cursor_sidecar` or the retired name `cursor-codex-launch`.
+
+## Install and resolve paths
+
+From the home repo, run `python3 scripts/install-skill.py --dest <absolute-skill-directory>` into a new or empty directory. It verifies the bundled files against their repo sources before copying, preserves executable preflights, and prints the installed wrapper SHA256. It refuses to overwrite an existing install. For an upgrade, stage into a new directory, verify it, then let the install owner replace the old directory. Copying the entire `.cursor/skills/Cursor_sidecar/` directory also works; never copy only `SKILL.md`.
+
+Set `SKILL_ROOT` to the absolute directory containing the loaded `SKILL.md`. All `scripts/`, `adapters/`, and `docs/` paths below are relative to **that skill root**, never the business repository or the caller's working directory. The complete tree includes:
+
+```text
+Cursor_sidecar/
+  SKILL.md
+  scripts/run-agent-with-tmux-signal.py
+  adapters/README.md
+  adapters/{codex,hermes,_template}/{ADAPTER.md,preflight.sh}
+  docs/architecture.md
+```
+
+Before launch, require `SKILL_ROOT/scripts/run-agent-with-tmux-signal.py` and the selected adapter's executable `preflight.sh` and `ADAPTER.md`. If absent, stop with `STATUS: STUCK`, item `incomplete Cursor_sidecar install`, and reinstall the complete tree. Do not search another project for a replacement script.
 
 **Home repo / Project:** [Kkkkkuro/Cursor_sidecar](https://github.com/Kkkkkuro/Cursor_sidecar) (public). Owning bot: tinkabot · 插件技能MCP.
 
@@ -40,7 +57,7 @@ Sequential: start the next session only after the previous signal arrives. Paral
 
 ## Preflight (fail means STUCK, do not launch)
 
-1. Run `adapters/<name>/preflight.sh`. Codex checks live in `adapters/codex/preflight.sh` (version, auth file present with byte length only, config `model` `gpt-6.1-sol` and `model_reasoning_effort` `xhigh`). Hermes checks live in `adapters/hermes/preflight.sh`. Do not print secrets.
+1. Check the complete install above, then run `"$SKILL_ROOT/adapters/<name>/preflight.sh"`. Codex checks live in `adapters/codex/preflight.sh` (version, auth file present with byte length only, config `model` `gpt-6.1-sol` and `model_reasoning_effort` `xhigh`). Hermes checks live in `adapters/hermes/preflight.sh`. Do not print secrets. Apply the GBrain pin gate below before selecting any alternate wrapper.
 2. Prove a writable local `RUN_DIR` (default local disk, not an external volume). External volumes need FDA/TCC for the CLI identity first (SO #20 and #21; setup before test).
 3. Resolve `tmux` to an absolute path (`TMUX_BIN`, else `/opt/homebrew/bin/tmux`, then `/usr/local/bin/tmux`, then `command -v tmux`). Pass that path as `TMUX_BIN` into the session. Bare `tmux` under a narrowed PATH has failed measured jobs.
 4. Prefer `wait-for -L <signal>` before start so the waiter is armed. Use one waiter per session.
@@ -50,14 +67,22 @@ Sequential: start the next session only after the previous signal arrives. Paral
 
 1. **Forbidden:** `tmux send-keys` for multi-line text or for pasting a full wrapper or python command line. That path mangled argv (e147a4c8) so the agent never ran.
 2. **Required start:** one of these.
-   - `tmux new-session -d -s <session> -- env TMUX_BIN=<abs-tmux> python3 <scripts/run-agent-with-tmux-signal.py> --agent-cmd '<one line>' --session <session> --signal <signal> --run-dir <dir> --timeout-sec <n>`
+   - `"$TMUX_BIN" new-session -d -s <session> -- env TMUX_BIN="$TMUX_BIN" python3 "$SKILL_ROOT/scripts/run-agent-with-tmux-signal.py" --agent-cmd '<one line>' --session <session> --signal <signal> --run-dir <dir> --timeout-sec <n>`
    - or write a one-line launcher script to disk, then `send-keys` only that script path (single line, no embedded newlines).
-3. Shared shell: `scripts/run-agent-with-tmux-signal.py` in this repo. One agent command per session. The script does not call `send-keys`.
-4. GBrain jobs that already pin in-repo `templates/run-codex-with-tmux-signal.py` keep that file. It is KM-owned. Do not rewrite the body from this skill or from EL.
+3. Shared shell: `"$SKILL_ROOT/scripts/run-agent-with-tmux-signal.py"` from the complete installed tree. One agent command per session. The script does not call `send-keys`.
+4. GBrain jobs that already pin in-repo `templates/run-codex-with-tmux-signal.py` keep that KM-owned file intact. The keep-exception preserves ownership, not permission to launch it. Apply the SO19 conformance gate below. Do not rewrite the KM wrapper body from this skill or from EL.
 5. Pass `RUN_DIR`, the signal name, and `agent-cmd` as arguments to the shell. Do not pass them through multi-line `send-keys`.
 6. The Cursor waiter must time out. Do not leave the worker `running` forever.
 
 `agent-cmd` is one line. Its first token is the agent binary. A Codex non-interactive job uses `codex exec` with the arguments that CLI already accepts.
+
+## GBrain pin: keep-exception and SO19 conformance gate
+
+Do not rewrite the KM-owned `templates/run-codex-with-tmux-signal.py` body. Citing Cursor_sidecar does not waive SO19. Before launching a pinned alternate wrapper, require normal-return **and** timeout-forced smoke evidence bound to its current SHA256. Both paths must independently read back `exit.txt` and `agent.exit` (and `codex.exit` for a `codex` basename), with identical bytes, **before** forwarding `wait-for -S`. The evidence must also show an absolute tmux executable honoring `TMUX_BIN`, one session/signal per agent, bounded waiting, and no multi-line `send-keys`.
+
+Missing evidence, a changed wrapper hash, or any failed requirement means `STATUS: STUCK`, item `SO19 noncompliant or unverified GBrain pin`. Do not run the pin. Redirect the launch plan to `"$SKILL_ROOT/scripts/run-agent-with-tmux-signal.py"` with the selected adapter and repeat preflight/smoke. If the job requires the exact alternate path, remain STUCK for KM/Owner to resolve. Do not alter that pin, production GBrain, or standing orders to clear this gate. A signal-before-write wrapper, a `codex.exit`-only wrapper, or bare `tmux` cannot pass.
+
+The home repo's `smoke/check-so19.py` measures the installed skill wrapper under a private real tmux server with a fixture executable named `codex`. It is a launch-shell test, not a live Codex/GBrain test. Record its normal and timeout readbacks and wrapper hash; do not reuse its pass for a different pinned wrapper.
 
 ## Completion bell (structural only)
 
@@ -95,6 +120,7 @@ Dispatchers keep the full paste in the Cursor dispatch template hard rules 7 and
 - exit-file path and contents (`exit.txt`, `agent.exit`, and `codex.exit` when the agent is codex)
 - wait-for signal name, and whether the bell was normal or timeout-forced
 - adapter name
+- installed `SKILL_ROOT`, wrapper SHA256, and alternate-pin gate disposition (when applicable)
 - for codex, the model and reasoning effort actually used
 - for any other adapter, the version line preflight printed
 - first STATUS line of RECEIPT, and that the worker exited
