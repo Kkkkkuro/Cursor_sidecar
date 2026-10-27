@@ -36,13 +36,16 @@ Cursor（Project Shell を含む）がデバイス上の Agent CLI を起動す�
 
 ### 技能の配置
 
-フリートを動かすマシンでは：
+リポジトリから完全なディレクトリをインストールする。配置先は新規または空のディレクトリに限る：
 
-```
-~/.cursor/skills/Cursor_sidecar/SKILL.md
+```sh
+python3 scripts/install-skill.py --check
+python3 scripts/install-skill.py --dest ~/.cursor/skills/Cursor_sidecar
 ```
 
-ジョブは作業用 `RUN_DIR` にコピーを置いてもよい。アダプタ経由で Agent CLI を起動する Cursor ステップの前に、このファイルを読む。
+`SKILL.md`、`scripts/run-agent-with-tmux-signal.py`、`adapters/`、`docs/architecture.md` がすべて必要。リポジトリの `.cursor/skills/Cursor_sidecar/` 全体をコピーしてもよい。ジョブの `RUN_DIR` も配置先にできる。`SKILL.md` だけでは不完全。インストーラはコピーと実行権限を検証し、読み戻して wrapper SHA256 を出力する。既存の配置は上書きしない。更新は新規ディレクトリで検証し、配置担当者が旧配置を置き換える。
+
+読み込んだ `SKILL.md` の絶対親ディレクトリを `SKILL_ROOT` とし、文中の `scripts/`、`adapters/`、`docs/` はそこから解決する。wrapper または選択したアダプタが欠けていたら `STATUS: STUCK` とし、完全な配置を用意してから起動する。
 
 この名前は GBrain / プラグインの `get_skill` カタログ項目では**ない**。BRIEF は `Cursor_sidecar` に対してプラグイン `get_skill` を呼んではならない。
 
@@ -104,7 +107,7 @@ Omit both to default to codex.
 
 - **Cursor Marketplace 技能ではない** — Owner がその公開を指名しない限り載せない。
 - **GBrain / プラグイン `get_skill` の登録名ではない** — それらのカタログにこの名前を足さない。
-- **KM 所有の GBrain ラッパー本文を書き換える許可ではない**（`templates/run-codex-with-tmux-signal.py`）。すでにそのファイルをピンしている GBrain ジョブはそのまま使う。
+- **KM 所有の GBrain ラッパー本文を書き換える許可ではない**（`templates/run-codex-with-tmux-signal.py`）。ファイルの保持は不適合な pin の実行許可ではない。起動前に SO19 ゲートを満たすこと：現在の SHA256 に対応する正常終了・強制タイムアウト両方の証拠、該当する終了ファイルの同一内容と信号前の書き込み、`TMUX_BIN` に従う絶対 tmux パス、有界の待機、複数行 `send-keys` なし。証拠不足・不適合なら `STATUS: STUCK`。完全な技能内の wrapper に起動計画を変更してプリフライトとスモークを再実行する。固定パスが必須なら KM/Owner に委ねて停止を維持する。KM 本文は書き換えない。
 
 ---
 

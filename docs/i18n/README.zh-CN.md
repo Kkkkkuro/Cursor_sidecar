@@ -36,13 +36,16 @@
 
 ### 落地技能
 
-在跑舰队的机器上：
+从仓库安装完整目录，目标必须是新目录或空目录：
 
-```
-~/.cursor/skills/Cursor_sidecar/SKILL.md
+```sh
+python3 scripts/install-skill.py --check
+python3 scripts/install-skill.py --dest ~/.cursor/skills/Cursor_sidecar
 ```
 
-任务也可在作业 `RUN_DIR` 下放一份副本。凡是 Cursor 步骤要通过适配器启动 Agent CLI，先加载该文件。
+必须同时包含 `SKILL.md`、`scripts/run-agent-with-tmux-signal.py`、`adapters/` 和 `docs/architecture.md`。也可整体复制仓库 `.cursor/skills/Cursor_sidecar/`，或安装到作业 `RUN_DIR`；只复制 `SKILL.md` 不算安装。安装器校验副本、保留执行权限、读回并输出 wrapper SHA256，不覆盖已有安装。升级先放入新目录验证，再由安装负责人替换旧目录。
+
+加载技能后，将 `SKILL_ROOT` 设为该 `SKILL.md` 所在的绝对目录。文中的 `scripts/`、`adapters/`、`docs/` 均相对此目录解析。缺 wrapper 或所选适配器则 `STATUS: STUCK`，补齐安装后才能启动。
 
 这个名字**不是** GBrain / 插件的 `get_skill` 目录项。BRIEF 不得对 `Cursor_sidecar` 调用插件 `get_skill`。
 
@@ -104,7 +107,7 @@ Omit both to default to codex.
 
 - **不是** Cursor Marketplace 技能 — 除非 Owner 点名发布，否则不要上架。
 - **不是** GBrain / 插件 `get_skill` 注册名 — 不要把这个名字写进那些目录。
-- **不是** 重写 KM 持有的 GBrain wrapper 正文的许可（`templates/run-codex-with-tmux-signal.py`）。已经钉死该文件的 GBrain 任务继续用它。
+- **不是** 重写 KM 持有的 GBrain wrapper 正文的许可（`templates/run-codex-with-tmux-signal.py`）。保留文件不代表可以继续运行不合规 pin。启动前必须通过技能的 SO19 合规门：绑定当前 SHA256 的正常返回和超时双路径证据，三个适用退出文件内容一致且先写后信号，使用绝对 tmux 并遵守 `TMUX_BIN`，等待有界且无多行 `send-keys`。缺证据或不合规则 `STATUS: STUCK`；启动方案改用完整技能内的 wrapper 并重新预检/冒烟；必须使用原路径的任务留给 KM/Owner 处理。不得重写 KM wrapper。
 
 ---
 

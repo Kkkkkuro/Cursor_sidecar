@@ -6,7 +6,7 @@ Authority for the completion bell is the Shared completion bell, then SO #19 and
 
 ## What the shell owns
 
-`scripts/run-agent-with-tmux-signal.py` is the shell. The caller puts that process in a tmux session with `new-session -d`. The process runs one agent command, writes the exit files, and then runs `tmux wait-for -S`. The agent is not asked to ring the bell.
+`scripts/run-agent-with-tmux-signal.py` is the shell, relative to the complete installed `SKILL_ROOT` (the directory containing the loaded `SKILL.md`). The caller puts that process in a tmux session with `new-session -d`. The process runs one agent command, writes the exit files, and then runs `tmux wait-for -S`. The agent is not asked to ring the bell.
 
 The shell keeps these launch rules.
 
@@ -17,7 +17,11 @@ The shell keeps these launch rules.
 - Do not call `send-keys` with more than one line. The supported start is `tmux new-session -d`, or a one-line script path if `send-keys` is unavoidable.
 - One agent CLI per tmux session. One session has one signal and one completion bell.
 
-A GBrain job that already pins `templates/run-codex-with-tmux-signal.py` keeps that file. That body is KM-owned. This repo does not rewrite it.
+A GBrain job that already pins `templates/run-codex-with-tmux-signal.py` keeps that file. That body is KM-owned. This repo does not rewrite it. The keep-exception is subject to the skill's SO19 conformance gate: normal-return and timeout-forced readbacks bound to the current wrapper SHA256, all applicable exit files written before signaling, absolute tmux honoring `TMUX_BIN`, and no multi-line `send-keys`. Missing or failing evidence is `STATUS: STUCK`. Redirect the launch plan to the installed skill wrapper and repeat preflight/smoke; an exact-path pin stays STUCK for KM/Owner.
+
+## Installing the skill
+
+The repo's `.cursor/skills/Cursor_sidecar/` is a self-contained directory with `SKILL.md`, the shared shell, adapter docs and executable preflights, and this architecture page. `python3 scripts/install-skill.py --check` rejects missing or stale bundled copies. `--dest <new-or-empty-directory>` installs and reads back the complete payload without overwriting an existing install. The top-level repo files remain the source for bundled mirrors; update both and run the check when they change. `SKILL.md` alone is not an installation.
 
 ## What an adapter owns
 

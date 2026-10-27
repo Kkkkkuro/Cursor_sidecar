@@ -36,13 +36,16 @@ Cursor(Project Shell 포함)가 장치 Agent CLI를 시작해야 할 때, 이 �
 
 ### 스킬 배치
 
-플릿이 돌아가는 머신에서는:
+저장소에서 완전한 디렉터리를 설치합니다. 대상은 새 디렉터리 또는 빈 디렉터리여야 합니다:
 
-```
-~/.cursor/skills/Cursor_sidecar/SKILL.md
+```sh
+python3 scripts/install-skill.py --check
+python3 scripts/install-skill.py --dest ~/.cursor/skills/Cursor_sidecar
 ```
 
-작업은 잡 `RUN_DIR` 아래에 복사본을 둘 수도 있습니다. 어댑터를 통해 Agent CLI를 시작하는 Cursor 단계 전에 이 파일을 읽으세요.
+`SKILL.md`, `scripts/run-agent-with-tmux-signal.py`, `adapters/`, `docs/architecture.md`가 모두 필요합니다. 저장소의 `.cursor/skills/Cursor_sidecar/` 전체를 복사하거나 작업 `RUN_DIR`에 설치해도 됩니다. `SKILL.md`만으로는 불완전합니다. 설치기는 복사본과 실행 권한을 검증하고 읽어서 wrapper SHA256을 출력하며, 기존 설치를 덮어쓰지 않습니다. 업데이트는 새 디렉터리에서 검증한 후 설치 담당자가 기존 디렉터리를 교체합니다.
+
+읽은 `SKILL.md`의 절대 부모 디렉터리를 `SKILL_ROOT`로 설정합니다. 본문의 `scripts/`, `adapters/`, `docs/`는 이 위치를 기준으로 해석합니다. wrapper 또는 선택한 어댑터가 없으면 `STATUS: STUCK`으로 멈추고 전체 설치를 먼저 완료합니다.
 
 이 이름은 GBrain / 플러그인 `get_skill` 카탈로그 항목이 **아닙니다**. BRIEF는 `Cursor_sidecar`에 대해 플러그인 `get_skill`을 호출하면 안 됩니다.
 
@@ -104,7 +107,7 @@ Omit both to default to codex.
 
 - **Cursor Marketplace 스킬이 아님** — Owner가 그 게시를 지정하지 않는 한 올리지 않음.
 - **GBrain / 플러그인 `get_skill` 등록 이름이 아님** — 그 카탈로그에 이 이름을 넣지 않음.
-- **KM 소유 GBrain 래퍼 본문을 다시 쓸 권한이 아님**(`templates/run-codex-with-tmux-signal.py`). 이미 그 파일을 고정한 GBrain 잡은 그대로 사용.
+- **KM 소유 GBrain 래퍼 본문을 다시 쓸 권한이 아님**(`templates/run-codex-with-tmux-signal.py`). 파일 보존은 비준수 pin 실행 허가가 아닙니다. 실행 전 SO19 게이트가 필요합니다: 현재 SHA256에 연결된 정상 반환 및 강제 타임아웃 증거, 해당 종료 파일의 동일 내용과 신호 전 기록, `TMUX_BIN`을 따르는 절대 tmux 경로, 유한 대기, 다중 행 `send-keys` 없음. 증거가 없거나 실패하면 `STATUS: STUCK`입니다. 완전한 스킬의 wrapper로 실행 계획을 전환하고 프리플라이트와 스모크를 다시 실행합니다. 정확한 고정 경로가 필수이면 KM/Owner가 해결할 때까지 멈춥니다. KM 본문은 수정하지 않습니다.
 
 ---
 

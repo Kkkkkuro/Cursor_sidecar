@@ -36,13 +36,27 @@ It lives on disk as a fleet skill, not as a plugin catalog entry.
 
 ### Land the skill
 
-On machines that run the fleet:
+Install the **complete directory**, including its wrapper and adapters. From this repo:
 
-```
-~/.cursor/skills/Cursor_sidecar/SKILL.md
+```sh
+python3 scripts/install-skill.py --check
+python3 scripts/install-skill.py --dest ~/.cursor/skills/Cursor_sidecar
 ```
 
-Jobs may also keep a copy under the job `RUN_DIR`. Load this file before any Cursor step that will start an agent CLI through an adapter.
+The destination must be new or empty. The helper verifies the checked-in bundle against the repo sources, preserves executable modes, reads back the installed files, and prints the wrapper SHA256. It never overwrites an existing install. Stage upgrades in a new directory and have the install owner replace the old directory after verification. A job-local install uses `--dest "$RUN_DIR/skill-install-dst"`.
+
+The repo's [complete skill tree](.cursor/skills/Cursor_sidecar/) can also be copied as a directory:
+
+```text
+~/.cursor/skills/Cursor_sidecar/
+  SKILL.md
+  scripts/run-agent-with-tmux-signal.py
+  adapters/README.md
+  adapters/{codex,hermes,_template}/{ADAPTER.md,preflight.sh}
+  docs/architecture.md
+```
+
+Loading `SKILL.md` alone is insufficient. Set `SKILL_ROOT` to its absolute containing directory and resolve all relative paths there, including in a business repository or job `RUN_DIR`. Missing wrapper or selected adapter means `STATUS: STUCK`; reinstall the complete tree before launch.
 
 This name is **not** a GBrain / plugin `get_skill` catalog entry. Briefs must not call plugin `get_skill` for `Cursor_sidecar`.
 
@@ -67,12 +81,18 @@ Omit both to default to codex.
 
 ### Launch shape (high level)
 
-1. Run `adapters/<name>/preflight.sh`. On failure → `STATUS: STUCK`, stop. Do not launch.
+1. Run `"$SKILL_ROOT/adapters/<name>/preflight.sh"`. On failure → `STATUS: STUCK`, stop. Do not launch.
 2. Prefer `tmux new-session -d` with env/argv into the shared wrapper. **Do not** paste a multi-line wrapper via `tmux send-keys` (that mangled argv and left the agent unstarted).
-3. Shared shell: `scripts/run-agent-with-tmux-signal.py` — one agent command per session.
+3. Shared shell: `"$SKILL_ROOT/scripts/run-agent-with-tmux-signal.py"` — one agent command per session.
 4. Waiter must time out; do not leave the worker `running` forever.
 
 Full hard rules live in the skill body and in `docs/architecture.md`.
+
+### GBrain pin keep-exception
+
+Keep the KM-owned `templates/run-codex-with-tmux-signal.py` file intact; **do not rewrite the KM wrapper body**. Keeping the file does not authorize running a noncompliant pin. The skill's **SO19 conformance gate** requires current-hash normal-return and timeout-forced evidence: identical `exit.txt` + `agent.exit` (+ `codex.exit` for codex) written before `wait-for -S`, absolute tmux honoring `TMUX_BIN`, bounded waiting, and no multi-line `send-keys`.
+
+Absent or failing evidence means `STATUS: STUCK`. Redirect the launch plan to the installed skill wrapper and repeat preflight/smoke, or leave an exact-path job STUCK for KM/Owner. A citation of Cursor_sidecar never bypasses this gate. See [smoke instructions](smoke/README.md) for isolated wrapper verification; this does not authorize a GBrain cutover.
 
 ---
 
@@ -104,7 +124,7 @@ Once `RUN_DIR` has a RECEIPT whose first STATUS line is `STATUS: FIXED` or `STAT
 
 - **Not** a Cursor Marketplace skill — do not publish there unless the Owner names that publish.
 - **Not** a GBrain / plugin `get_skill` registration — do not add this name to those catalogs.
-- **Not** a license to rewrite the KM-owned GBrain wrapper body (`templates/run-codex-with-tmux-signal.py`). GBrain jobs that already pin that file keep it.
+- **Not** a license to rewrite the KM-owned GBrain wrapper body (`templates/run-codex-with-tmux-signal.py`). Pinned jobs keep the file and must pass the SO19 conformance gate before using it.
 
 ---
 
