@@ -16,7 +16,7 @@
 
 它以磁盘上的舰队技能形式存在，不是插件目录里的名字。
 
-**负责 Bot：** tinkabot · 插件技能MCP  
+**负责 Bot：** Engineering Lead · 工程师  
 **仓库：** [Kkkkkuro/Cursor_sidecar](https://github.com/Kkkkkuro/Cursor_sidecar)
 
 ---

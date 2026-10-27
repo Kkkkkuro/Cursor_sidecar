@@ -33,7 +33,7 @@ Cursor_sidecar/
 
 Before launch, require `SKILL_ROOT/scripts/run-agent-with-tmux-signal.py` and the selected adapter's executable `preflight.sh` and `ADAPTER.md`. If absent, stop with `STATUS: STUCK`, item `incomplete Cursor_sidecar install`, and reinstall the complete tree. Do not search another project for a replacement script.
 
-**Home repo / Project:** [Kkkkkuro/Cursor_sidecar](https://github.com/Kkkkkuro/Cursor_sidecar) (public). Owning bot: tinkabot · 插件技能MCP.
+**Home repo / Project:** [Kkkkkuro/Cursor_sidecar](https://github.com/Kkkkkuro/Cursor_sidecar) (public). Owning bot: Engineering Lead · 工程师.
 
 Evidence for the launch hard rule: t1895u-r1 STUCK RECEIPT `e147a4c8` (tmux `send-keys` multi-line mangled `python3 '/Users/...`; wrapper and Codex never started). Mini smoke t2869u FIXED (RECEIPT sha256 `5a3b22e2…`).
 
@@ -130,4 +130,4 @@ Dispatchers keep the full paste in the Cursor dispatch template hard rules 7 and
 - Do not publish this as a Cursor Marketplace or plugin skill unless the Owner names that publish.
 - Do not register it in a GBrain plugin `get_skill` catalog.
 - Do not rewrite the KM-owned GBrain wrapper body from this skill.
-- Owning bot is tinkabot · 插件技能MCP. Other bots do not rewrite the skill body without Owner or tinkabot.
+- Owning bot is Engineering Lead · 工程师. Other bots do not rewrite the skill body without Owner or Engineering Lead.
