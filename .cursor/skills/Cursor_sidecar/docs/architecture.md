@@ -29,6 +29,16 @@ An adapter is a directory under `adapters/`. It supplies `preflight.sh` and `ADA
 
 This repo ships `adapters/codex/`, `adapters/hermes/`, and `adapters/_template/`.
 
+## Who owns model, effort and fast
+
+Python 3.11+ `scripts/agent_defaults.py` owns the three-field resolution contract. The complete installed skill includes this helper, but no user choices. Explicit setup writes a local `[codex]` table in `$SKILL_ROOT/defaults.toml`; the CLI has no product-model fallback. Later `setup --replace` backs up the previous bytes and atomically publishes all three new choices. Backup bytes and the containing directory are flushed before replacement. A failed post-publication readback returns an error with the backup retained: inspect and restore manually rather than automatically clobbering a concurrent change. A setup lock prevents competing setup writers, and first publication refuses an existing target. Do not remove an unexplained leftover lock automatically.
+
+Unindented scalar BRIEF keys `agent_model`, `agent_effort` and `agent_fast` override saved fields for one invocation. Both preflight and wrapper accept the same `--brief` and optional `--defaults-file`. The wrapper resolves again at launch; keep these inputs unchanged between preflight and launch. Malformed/missing defaults fail closed even with a complete override. No mutable module-global choice or process environment changes the selected values.
+
+Codex uses per-process `-c` overrides, supported by the installed CLI help, instead of demanding that the base user file equal the job's choices. This is the evidence-based change from the initial design's proposed live-file equality/sync: CLI precedence makes file rewriting unnecessary. Preflight validates base TOML and the resolved settings; the wrapper applies model, reasoning effort, service tier and fast-mode feature. Conflicting settings flags in the command are refused. `fast=false` explicitly requests the default tier with the feature off. User config, credentials and standing orders are untouched. Provider/account availability is validated by Codex, not by fixture tests.
+
+Hermes and the template explicitly mark all three fields N/A in their adapter docs because their CLI mappings are unmeasured. They must not invent flags or silently consume Codex choices. A runnable future adapter must extend this shared resolver or explain unsupported fields.
+
 ## Who picks the agent
 
 The BRIEF picks the agent for that job.

@@ -17,8 +17,8 @@ Fixture success does not certify a live login, model response, or fleet rollout.
 Use one **Bash** session for the sections below, from this repository. Python 3.11+
 and tmux are required. Keep the fleet skill, adapters, shared wrapper and KM-owned
 wrapper unchanged. Never inspect credential contents or dump configuration/environment.
-The optional Codex preflight prints only version, auth byte length and the two
-allowlisted model/effort identifiers. A failed real preflight means STUCK; do not
+The optional Codex preflight prints only version, auth byte length and the resolved
+model/effort/fast choices. A failed real preflight means STUCK; do not
 launch an agent as a fallback.
 
 ## Launch
@@ -196,7 +196,8 @@ and the transcript; a process guard must not race a background logging process.
 
 - `scripts/install-skill.py`: validate the complete bundle; install into a new/empty directory; refuse overwrite.
 - `smoke/check-so19.py`: real private tmux plus a fixture, normal and timeout paths.
-- `adapters/codex/preflight.sh`: version, auth presence/length and exact configured model/effort gate.
+- `scripts/agent_defaults.py`: explicit first-run model/effort/fast, backed-up changes and BRIEF overrides; setup is outside this read-only journey.
+- `adapters/codex/preflight.sh`: version, auth presence/length, base TOML and resolved model/effort/fast gate.
 - `adapters/hermes/preflight.sh`: fails closed for missing CLI and currently for unmeasured non-interactive invocation.
 - `tests/test_skill_install.py`: install regression suite. Optional checkout regression:
 

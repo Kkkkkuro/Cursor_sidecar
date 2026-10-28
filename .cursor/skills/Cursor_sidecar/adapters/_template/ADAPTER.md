@@ -4,6 +4,10 @@ Copy this directory to `adapters/<cli-name>/` only after the Owner names the age
 
 CLI name: `AGENT_BIN` (the executable name, not a product this repo already rejected).
 
+## Model / effort / fast defaults
+
+`model`, `effort` and `fast` are all **N/A in this uninstantiated template** because no CLI or measured configuration mapping exists yet. A new adapter must use the shared `scripts/agent_defaults.py` surface with measured per-process mappings, or give an explicit N/A reason for each unsupported field. Never inherit Codex values or silently drop BRIEF overrides. The wrapper currently refuses `--brief`/`--defaults-file` for non-Codex commands. Keep preflight fail-closed until those decisions and the launch are measured.
+
 ## Version check
 
 `"$AGENT_BIN" --version`. Print the version line only.

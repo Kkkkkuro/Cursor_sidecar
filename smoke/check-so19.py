@@ -44,10 +44,13 @@ def main():
     fixture = root / "codex"
     fixture.write_text(
         f"#!{sys.executable}\nimport sys, time\n"
-        "if sys.argv[1] == 'timeout': time.sleep(60)\n"
+        "if sys.argv[-1] == 'timeout': time.sleep(60)\n"
         "sys.exit(7)\n", encoding="utf-8",
     )
     fixture.chmod(0o700)
+    # Explicit fixture choices, never a production model fallback.
+    defaults = root / "defaults.toml"
+    defaults.write_text('[codex]\nmodel="fixture-model"\neffort="medium"\nfast=false\n')
     proxy = root / "tmux-proxy"
     proxy.write_text(
         f"#!{sys.executable}\n"
@@ -87,7 +90,8 @@ def main():
         timeout = "0.25" if args.mode == "timeout" else "5"
         launch = base + ["new-session", "-d", "-s", session, "--", "env",
                          f"TMUX_BIN={proxy}", sys.executable, str(wrapper),
-                         "--agent-cmd", shlex.join([str(fixture), args.mode]),
+                         "--agent-cmd", shlex.join([str(fixture), "exec", "--", args.mode]),
+                         "--defaults-file", str(defaults),
                          "--session", session, "--signal", signal_name,
                          "--run-dir", str(root), "--timeout-sec", timeout]
         (root / "launch.json").write_text(json.dumps(launch, indent=2) + "\n")

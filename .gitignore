@@ -1,0 +1,3 @@
+# Choices belong to the installed skill, never to the public bundle.
+defaults.toml*
+**/__pycache__/

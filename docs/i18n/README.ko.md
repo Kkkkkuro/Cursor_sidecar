@@ -49,6 +49,35 @@ python3 scripts/install-skill.py --dest ~/.cursor/skills/Cursor_sidecar
 
 이 이름은 GBrain / 플러그인 `get_skill` 카탈로그 항목이 **아닙니다**. BRIEF는 `Cursor_sidecar`에 대해 플러그인 `get_skill`을 호출하면 안 됩니다.
 
+### 첫 실행 모델, 추론 강도, fast 선택
+
+Python 3.11+가 필요합니다. 첫 Codex 실행 전에 세 값을 모두 명시적으로 선택합니다.
+
+```sh
+python3 "$SKILL_ROOT/scripts/agent_defaults.py" setup --model <선택모델> --effort <선택강도> --fast false
+```
+
+이 문서화된 setup은 `[codex]`의 `model`, `effort`, 불리언 `fast`를 `$SKILL_ROOT/defaults.toml`에 저장합니다. 기본 위치는 `~/.cursor/skills/Cursor_sidecar/defaults.toml`입니다. 설치된 CLI와 계정이 지원하는 모델 및 강도를 선택하세요. 파일이 없으면 사전 검사와 실행은 `STATUS: STUCK`으로 중단되고 setup 안내를 표시합니다. 고정 제품 모델로 대체하지 않습니다. 나중에 세 값과 `--replace`를 지정하여 setup을 다시 실행하면 변경됩니다. 이전 바이트는 먼저 `defaults.toml.backup-*`에 보관합니다. 로컬 선택 및 백업은 Git에 넣지 말고, 업데이트용 디렉터리를 준비할 때 별도로 보존하세요.
+
+작업별 덮어쓰기는 BRIEF에 들여쓰기와 따옴표 없는 스칼라 키로 지정합니다.
+
+```text
+agent_model: your-model
+agent_effort: high
+agent_fast: true
+```
+
+제공한 키만 저장값을 덮어쓰고 생략한 키는 기본값을 유지합니다. 세 항목을 모두 덮어써도 유효한 defaults 파일이 필요합니다. 사전 검사와 공용 wrapper에 **동일한** `--brief /absolute/BRIEF.md`를 전달합니다. 두 명령 모두 `--defaults-file /absolute/defaults.toml`로 다른 저장 파일을 선택할 수 있습니다. setup 도구에서는 이 인수를 `setup`/`resolve` **앞에** 둡니다. 중복 키, 빈 값이나 잘못된 식별자, true/false 이외의 fast, 잘못된 TOML은 거부합니다. `agents:`의 각 Codex session에 같은 값을 적용하며, 서로 다른 선택은 별도 BRIEF를 사용합니다.
+
+설정과 BRIEF는 일반 파일이어야 하며 빈 경로는 거부합니다. setup이 설정을 게시한 뒤 읽기 검증에 실패하면 오류를 반환하고 백업을 보존합니다. 재시도나 수동 복원 전에 두 파일을 확인하세요. 동시에 발생한 변경을 자동으로 덮어쓰지 않습니다.
+
+```sh
+"$SKILL_ROOT/adapters/codex/preflight.sh" --brief "$BRIEF"
+# 기존 tmux wrapper 실행에도 --brief "$BRIEF"를 추가합니다.
+```
+
+wrapper는 해석한 설정을 프로세스별 Codex CLI 인수로 적용합니다. 사전 검사는 기본 TOML 및 해석된 실행 설정을 검증하며, 모델과 강도를 고정하지 않고 `~/.codex/config.toml`을 수정하지 않습니다. `codex exec -- 'prompt'`를 사용합니다. defaults/BRIEF를 우회하지 못하도록 `--` 앞의 설정 덮어쓰기 인수는 거부합니다. fast=true는 `service_tier="fast"`와 `features.fast_mode=true`, false는 명시적으로 `"default"`와 false에 대응합니다. 가용성은 계정과 모델에 따라 다르며 fast는 사용량을 늘릴 수 있습니다. [공식 속도 문서](https://learn.chatgpt.com/docs/agent-configuration/speed)를 참고하세요. Hermes와 `_template`은 실행 및 설정 매핑이 측정되지 않아 `ADAPTER.md`에 세 항목 모두 N/A로 명시합니다. Hermes는 계속 실행을 거부합니다. 전체 설치에는 `scripts/agent_defaults.py`도 포함됩니다.
+
 ### 업무만 BRIEF에서의 인용
 
 ```

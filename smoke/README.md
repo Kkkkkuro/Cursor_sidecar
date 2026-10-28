@@ -13,6 +13,8 @@ python3 smoke/check-so19.py --wrapper "$RUN_DIR/skill-install-dst/scripts/run-ag
 
 Each destination must be new or empty. Keep RUN_DIR short enough for a Unix socket (the script checks). Normal returns code 7 to test nonzero propagation; timeout kills the hung fixture and records code 124. Each case launches the installed wrapper with `new-session -d` and an absolute `TMUX_BIN` proxy that delegates to absolute real tmux. The proxy reads all three exit files **before** forwarding `wait-for -S`. `at-signal.json` contains the contents, SHA256 values and call arguments; `launch.json`, `tmux-calls.jsonl` and `summary.json` prove the start, bounded waiter and no `send-keys`. Only the private test server is stopped afterward.
 
+The smoke explicitly writes a local fixture `[codex]` defaults file and passes `--defaults-file` to the wrapper with `codex exec -- <mode>`. The fixture does not contact a provider. It tests resolution and completion structure, not account support, model quality or actual fast speed. Unit tests also cover setup write/readback, backed-up replacement, BRIEF overrides, preflight against base config with different values, invalid config/override/auth refusal, command flag conflicts and no-child exit/bell behavior. Python 3.11+ is required.
+
 The keep-exception for the KM-owned GBrain wrapper does not authorize its use without the skill's current-hash SO19 evidence. Do not rewrite its body. Missing/failed evidence is STUCK; redirect the plan to the installed skill wrapper and repeat preflight/smoke. These fixture results cannot certify a different wrapper or authorize a live cutover.
 
 Install regressions (keep scratch files local to the job):
