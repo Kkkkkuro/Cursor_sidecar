@@ -15,6 +15,10 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
+# Keep the exact installed/bundled tree reusable after ordinary invocation.
+sys.dont_write_bytecode = True
+from agent_defaults import ConfigError, codex_command, resolve
+
 CODEX_AGENT_NAME = "codex"
 EXIT_FILE_NAMES = ("exit.txt", "agent.exit")
 CODEX_EXIT_ALIAS = "codex.exit"
@@ -210,6 +214,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--signal", required=True)
     parser.add_argument("--run-dir", required=True)
     parser.add_argument("--timeout-sec", required=True)
+    parser.add_argument("--defaults-file", type=Path)
+    parser.add_argument("--brief", type=Path)
     try:
         return parser.parse_args(argv)
     except argparse.ArgumentError as exc:
@@ -238,6 +244,13 @@ def launch(argv: list[str]) -> RunResult:
     require_token(ns.signal, "signal")
     require_timeout(ns.timeout_sec)
     agent_argv = parse_agent_cmd(ns.agent_cmd)
+    try:
+        if agent_basename(agent_argv) == CODEX_AGENT_NAME:
+            agent_argv = codex_command(agent_argv, resolve(ns.defaults_file, ns.brief))
+        elif ns.defaults_file is not None or ns.brief is not None:
+            raise ConfigError("model/effort/fast N/A for this adapter; see ADAPTER.md")
+    except ConfigError as exc:
+        raise UsageError(str(exc)) from exc
     tmux_bin = resolve_tmux()
     if tmux_bin is None:
         return RunResult(RunStatus.ERROR, 127, "tmux binary not found")

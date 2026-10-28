@@ -49,6 +49,35 @@ python3 scripts/install-skill.py --dest ~/.cursor/skills/Cursor_sidecar
 
 这个名字**不是** GBrain / 插件的 `get_skill` 目录项。BRIEF 不得对 `Cursor_sidecar` 调用插件 `get_skill`。
 
+### 首次选择模型、推理强度和 fast
+
+需要 Python 3.11+。首次启动 Codex 前，显式选择全部三项：
+
+```sh
+python3 "$SKILL_ROOT/scripts/agent_defaults.py" setup --model <所选模型> --effort <所选强度> --fast false
+```
+
+此文档化 setup 将 `[codex]` 下的 `model`、`effort` 和布尔 `fast` 写入 `$SKILL_ROOT/defaults.toml`，通常为 `~/.cursor/skills/Cursor_sidecar/defaults.toml`。选择当前 CLI/账号支持的模型和强度。文件缺失时预检及启动返回 `STATUS: STUCK` 并提示 setup，没有固定产品模型兜底。以后重复 setup、提供全部三项并加 `--replace` 即可修改；原始字节先备份为 `defaults.toml.backup-*`。本地选择与备份不进 Git；升级暂存新目录时单独保留。
+
+单次作业可在 BRIEF 中写无缩进、无引号的标量键：
+
+```text
+agent_model: your-model
+agent_effort: high
+agent_fast: true
+```
+
+每个已提供的键覆盖对应默认值，省略则保留；即使三项全覆盖，仍须先有有效 defaults 文件。预检和共用 wrapper 必须传入**相同**的 `--brief /absolute/BRIEF.md`。两者均可用 `--defaults-file /absolute/defaults.toml` 指向另一份保存文件；setup 工具的此参数放在 `setup`/`resolve` **之前**。重复键、空值或非法标识符、非字面量 true/false 和无效 TOML 均拒绝。`agents:` 中每个 Codex session 使用相同覆盖；不同选择用各自 BRIEF。
+
+配置及 BRIEF 必须是普通文件，空路径会被拒绝。若 setup 已发布选择但读回失败，会报错并保留备份；重试或手工恢复前先检查两者，不自动覆盖并发修改。
+
+```sh
+"$SKILL_ROOT/adapters/codex/preflight.sh" --brief "$BRIEF"
+# 原有 tmux wrapper 启动命令也追加 --brief "$BRIEF"。
+```
+
+wrapper 以 Codex 单次 CLI 参数应用解析结果；预检验证基础 TOML 与解析后的启动配置，不再要求固定模型/强度，也不改写 `~/.codex/config.toml`。命令使用 `codex exec -- 'prompt'`；`--` 之前的配置覆盖参数会被拒绝，避免绕过 defaults/BRIEF。fast=true 映射到 `service_tier="fast"` 和 `features.fast_mode=true`，false 显式设为 `"default"` 和 false。可用性取决于账号/模型，fast 可能增加用量，见[官方速度说明](https://learn.chatgpt.com/docs/agent-configuration/speed)。Hermes 和 `_template` 的 `ADAPTER.md` 将三项均标为 N/A，因为启动与配置映射尚未实测；Hermes 保持失败关闭。完整安装现包含 `scripts/agent_defaults.py`。
+
 ### 在仅业务 BRIEF 里引用
 
 ```

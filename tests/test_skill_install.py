@@ -33,6 +33,7 @@ class SkillInstallTests(unittest.TestCase):
         isolated = self.work / "standalone"
         shutil.copytree(SKILL, isolated)
         for name in ("scripts/run-agent-with-tmux-signal.py",
+                     "scripts/agent_defaults.py",
                      "adapters/codex/preflight.sh", "adapters/hermes/preflight.sh",
                      "adapters/_template/preflight.sh", "docs/architecture.md"):
             self.assertTrue((isolated / name).is_file(), name)
@@ -41,6 +42,13 @@ class SkillInstallTests(unittest.TestCase):
             cwd=self.work, capture_output=True, text=True, check=False,
         )
         self.assertEqual(proc.returncode, 0, proc.stderr)
+        helper = isolated / "scripts/agent_defaults.py"
+        proc = subprocess.run([sys.executable, str(helper), "setup", "--model", "isolated-choice",
+                               "--effort", "medium", "--fast", "false"],
+                              cwd=self.work, capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertTrue((isolated / "defaults.toml").is_file())
+        self.assertFalse((ROOT / "defaults.toml").exists())
 
     def test_install_complete_and_identical(self):
         dest = self.work / "installed skill"
@@ -54,6 +62,21 @@ class SkillInstallTests(unittest.TestCase):
             self.assertEqual((SKILL / name).stat().st_mode & 0o777,
                              (dest / name).stat().st_mode & 0o777)
         self.assertTrue(os.access(dest / "adapters/codex/preflight.sh", os.X_OK))
+
+    def test_ordinary_bundled_wrapper_use_keeps_bundle_valid(self):
+        repo = self.work / "repo"
+        for name in ("scripts", "adapters", ".cursor/skills/Cursor_sidecar"):
+            shutil.copytree(ROOT / name, repo / name)
+        (repo / "docs").mkdir()
+        shutil.copy2(ROOT / "docs/architecture.md", repo / "docs/architecture.md")
+        env = os.environ.copy()
+        env.pop("PYTHONDONTWRITEBYTECODE", None)
+        env.pop("PYTHONPYCACHEPREFIX", None)
+        proc = subprocess.run([sys.executable, str(repo / ".cursor/skills/Cursor_sidecar/scripts/run-agent-with-tmux-signal.py"), "--help"], env=env, capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertFalse(list((repo / ".cursor/skills/Cursor_sidecar").rglob("*.pyc")))
+        proc = self.install("--check", script=repo / "scripts/install-skill.py")
+        self.assertEqual(proc.returncode, 0, proc.stderr)
 
     def test_refuses_nonempty_destination(self):
         dest = self.work / "existing"

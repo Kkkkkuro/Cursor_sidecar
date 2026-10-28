@@ -9,4 +9,6 @@ Each agent directory contains two files.
 
 `agent-cmd` is one argv vector. Its first token is the agent binary. The shell does not start a second CLI in the same tmux session.
 
+Configuration uses `scripts/agent_defaults.py`: explicit first-run model/effort/fast, saved under the skill root in `defaults.toml`, with individual BRIEF overrides. Each adapter must implement this surface or document N/A with a concrete reason in `ADAPTER.md`. Codex implements it; Hermes and the template currently document all three fields as N/A because their launch mappings are unmeasured. Pass the same `--brief` and optional `--defaults-file` to preflight and the wrapper. Do not put settings flags into `agent-cmd` to bypass resolution.
+
 Copy `adapters/_template/` when the Owner names a new agent. Do not point a copy at a product the Owner has not named.

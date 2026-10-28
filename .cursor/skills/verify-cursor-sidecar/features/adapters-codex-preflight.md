@@ -1,15 +1,16 @@
 # Codex adapter preflight
 
 Before a real launch, the Codex adapter checks CLI version, nonempty auth file and
-the configured `gpt-6.1-sol` / `xhigh` pair. This is a readiness check, not a model
+the resolved model, reasoning effort and fast choices. This is a readiness check, not a model
 request or proof that the credentials are valid with the service.
 
 ## Sub-features
 
 - Missing `codex` on PATH, failed version probe or missing/empty auth returns STUCK.
 - Reads `${CODEX_HOME:-$HOME/.codex}/config.toml` with Python `tomllib`.
-- Prints version, auth byte length and the two allowlisted model/effort identifiers.
-- Model or effort mismatch exits 1; successful readiness prints `STATUS: ok`.
+- Resolves the skill's explicit first-run `defaults.toml` and optional unindented BRIEF `agent_model` / `agent_effort` / `agent_fast` overrides using `scripts/agent_defaults.py`.
+- Prints version, auth byte length and the three resolved choices without dumping base config.
+- Missing/malformed defaults or BRIEF, non-regular inputs or unusable auth exit 1; successful readiness prints `STATUS: ok`. No fixed model/effort pair is required in the base config, because the wrapper supplies per-process CLI overrides.
 
 ## How to get to it (user POV)
 
@@ -25,7 +26,9 @@ From the repository root, in the initialized Bash session:
 run adapters/codex/preflight.sh
 ```
 
-Success requires exit 0 and `STATUS: ok` with the exact model/effort pair. Preserve
+First complete the explicit setup documented in the fleet skill; do not pick a model automatically for this check. Pass identical `--brief "$BRIEF"` and optional `--defaults-file <absolute-path>` to preflight and wrapper when used. This read-only journey must not run setup or modify saved defaults itself.
+
+Success requires exit 0 and `STATUS: ok` with the expected resolved model/effort/fast. Preserve
 the curated output and exit code in `$PROOF_DIR/commands.log`. A failure is the
 observed readiness result: record the failing item, retain scratch and stop the real
 launch. Do not edit auth/configuration, change the session model or run `codex exec`
@@ -49,7 +52,6 @@ PY
 
 The check resolves `codex` from the current PATH; a fixture or shim there changes
 what version is being measured. Python must support `tomllib` (3.11+). Malformed TOML
-can raise a parser exception rather than a formatted STUCK result; still fail closed
-and do not launch. Never print auth contents, complete config, tokens or environment.
+returns a sanitized STUCK result; do not launch. Pass the same defaults/BRIEF inputs to the wrapper and keep them unchanged until launch. Provider model/effort support and fast entitlement are not proven by this local check. Never print auth contents, complete config, tokens or environment.
 Hermes is separate: its current adapter fails closed even when its version succeeds,
 because non-interactive invocation remains unmeasured.

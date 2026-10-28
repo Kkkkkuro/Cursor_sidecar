@@ -26,6 +26,7 @@ Set `SKILL_ROOT` to the absolute directory containing the loaded `SKILL.md`. All
 Cursor_sidecar/
   SKILL.md
   scripts/run-agent-with-tmux-signal.py
+  scripts/agent_defaults.py
   adapters/README.md
   adapters/{codex,hermes,_template}/{ADAPTER.md,preflight.sh}
   docs/architecture.md
@@ -55,9 +56,37 @@ Several agents use several tmux sessions. Each agent gets its own session name, 
 
 Sequential: start the next session only after the previous signal arrives. Parallel: start the sessions together and wait on each signal with its own waiter. See `docs/architecture.md`.
 
+## First-run defaults and job overrides
+
+Python 3.11+ is required. Before the first Codex launch, ask the user to choose a model, reasoning effort and whether fast is enabled, then perform the documented setup:
+
+```sh
+python3 "$SKILL_ROOT/scripts/agent_defaults.py" setup --model <chosen-model> --effort <chosen-effort> --fast false
+```
+
+Set `--fast true` only when chosen. This writes `[codex]` with `model`, `effort`, `fast` to `$SKILL_ROOT/defaults.toml` (normally `~/.cursor/skills/Cursor_sidecar/defaults.toml`). There is no forced product-model or effort fallback. Missing defaults return `STATUS: STUCK` with setup instructions; even a complete job override cannot skip first-run. Change all three later with the same command plus `--replace`; the helper backs up existing bytes as `defaults.toml.backup-*` before atomic replacement. Preserve local choices/backups separately when staging an upgrade; never bundle or commit them. An unexplained setup lock must be inspected, not deleted automatically.
+
+The BRIEF may contain unquoted, unindented scalar keys, one per line:
+
+```text
+agent_model: chosen-model
+agent_effort: high
+agent_fast: true
+```
+
+Each present field overrides its saved default; omitted fields retain saved values. Duplicate keys, invalid/empty identifiers, fast other than literal `true`/`false`, unreadable BRIEF and malformed defaults fail closed. Model/effort identifiers must be supported by the installed CLI/account; the resolver validates structure, not provider entitlement. For `agents:`, flat overrides apply to every selected Codex session; use separate BRIEFs for different choices.
+
+Configuration and BRIEF must be regular files; empty paths are refused. Setup flushes backups before replacement. A failed readback after publication reports an error and retains the backup: inspect before retrying or restoring manually, rather than automatically overwriting a concurrent change.
+
+Pass the same `--brief /absolute/BRIEF.md` and optional `--defaults-file /absolute/defaults.toml` to both the Codex preflight and shared wrapper, and keep these inputs unchanged between checks and launch. A job-local skill copy otherwise uses the defaults beside its own SKILL.md. On the setup/resolve helper, `--defaults-file` goes before the subcommand. Example preflight: `"$SKILL_ROOT/adapters/codex/preflight.sh" --brief "$BRIEF"`; append `--brief "$BRIEF"` to the existing tmux wrapper argv as well.
+
+Codex preflight parses the base config and validates resolved settings. The wrapper uses per-process `-c` overrides for `model`, `model_reasoning_effort`, `service_tier` and `features.fast_mode`, so it never rewrites `~/.codex/config.toml` or demands a fixed model/effort in it. Fast=true maps to `"fast"` and true; false explicitly uses `"default"` and false. Fast availability depends on the account/model and may increase usage; see [official speed documentation](https://learn.chatgpt.com/docs/agent-configuration/speed). Use `codex exec -- 'prompt'`; settings flags in `agent-cmd` are refused before `--` to prevent a second override channel. See `adapters/codex/ADAPTER.md` for details.
+
+Hermes and `_template` explicitly mark model/effort/fast all N/A in `ADAPTER.md`, with the reason that their CLI mappings are unmeasured. Hermes still fails preflight. The wrapper refuses these new config arguments for non-Codex commands; do not guess flags or silently ignore choices.
+
 ## Preflight (fail means STUCK, do not launch)
 
-1. Check the complete install above, then run `"$SKILL_ROOT/adapters/<name>/preflight.sh"`. Codex checks live in `adapters/codex/preflight.sh` (version, auth file present with byte length only, config `model` `gpt-6.1-sol` and `model_reasoning_effort` `xhigh`). Hermes checks live in `adapters/hermes/preflight.sh`. Do not print secrets. Apply the GBrain pin gate below before selecting any alternate wrapper.
+1. Check the complete install above, including `scripts/agent_defaults.py`, then run `"$SKILL_ROOT/adapters/<name>/preflight.sh"` with the same config arguments used for launch. Codex checks version, auth file present with byte length only, base config TOML and resolved defaults plus BRIEF overrides. Hermes checks live in `adapters/hermes/preflight.sh`. Do not print secrets. Apply the GBrain pin gate below before selecting any alternate wrapper.
 2. Prove a writable local `RUN_DIR` (default local disk, not an external volume). External volumes need FDA/TCC for the CLI identity first (SO #20 and #21; setup before test).
 3. Resolve `tmux` to an absolute path (`TMUX_BIN`, else `/opt/homebrew/bin/tmux`, then `/usr/local/bin/tmux`, then `command -v tmux`). Pass that path as `TMUX_BIN` into the session. Bare `tmux` under a narrowed PATH has failed measured jobs.
 4. Prefer `wait-for -L <signal>` before start so the waiter is armed. Use one waiter per session.
@@ -121,7 +150,7 @@ Dispatchers keep the full paste in the Cursor dispatch template hard rules 7 and
 - wait-for signal name, and whether the bell was normal or timeout-forced
 - adapter name
 - installed `SKILL_ROOT`, wrapper SHA256, and alternate-pin gate disposition (when applicable)
-- for codex, the model and reasoning effort actually used
+- for codex, the model, reasoning effort and fast request actually used, plus defaults file path (name only) and whether BRIEF overrides were applied
 - for any other adapter, the version line preflight printed
 - first STATUS line of RECEIPT, and that the worker exited
 

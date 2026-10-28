@@ -49,6 +49,35 @@ python3 scripts/install-skill.py --dest ~/.cursor/skills/Cursor_sidecar
 
 この名前は GBrain / プラグインの `get_skill` カタログ項目では**ない**。BRIEF は `Cursor_sidecar` に対してプラグイン `get_skill` を呼んではならない。
 
+### 初回のモデル・推論強度・fast の選択
+
+Python 3.11+ が必要です。Codex の初回起動前に、3 項目すべてを明示的に選択します。
+
+```sh
+python3 "$SKILL_ROOT/scripts/agent_defaults.py" setup --model <選択モデル> --effort <選択強度> --fast false
+```
+
+この文書化された setup は、`[codex]` の `model`、`effort`、真偽値 `fast` を `$SKILL_ROOT/defaults.toml`（通常は `~/.cursor/skills/Cursor_sidecar/defaults.toml`）へ保存します。CLI とアカウントが対応するモデル・強度を選んでください。ファイルがなければ事前検査と起動は `STATUS: STUCK` となり、setup を案内します。固定の製品モデルへのフォールバックはありません。変更時は全項目と `--replace` を指定して setup を再実行します。元のバイト列を先に `defaults.toml.backup-*` へ保存します。設定とバックアップは Git に入れず、更新用ディレクトリを用意するときは別途保持します。
+
+ジョブ単位の上書きは、BRIEF のインデント・引用符なしのスカラーキーで指定します。
+
+```text
+agent_model: your-model
+agent_effort: high
+agent_fast: true
+```
+
+指定した項目だけが保存値を上書きし、省略項目は保存値を使います。全項目を上書きする場合も有効な defaults ファイルは必要です。事前検査と共有 wrapper に**同じ** `--brief /absolute/BRIEF.md` を渡します。両方で `--defaults-file /absolute/defaults.toml` を指定できます。setup ツールではこの引数を `setup`/`resolve` の**前**に置きます。重複キー、空値・不正な識別子、true/false 以外の fast、不正な TOML は拒否します。`agents:` の各 Codex session に同じ上書きを適用します。異なる選択には別々の BRIEF を使います。
+
+設定と BRIEF は通常ファイルに限り、空のパスは拒否します。setup が設定を公開した後に読み戻しが失敗した場合、エラーを返してバックアップを保持します。再試行や手動復元の前に両方を確認してください。同時に行われた変更を自動で上書きしません。
+
+```sh
+"$SKILL_ROOT/adapters/codex/preflight.sh" --brief "$BRIEF"
+# 既存の tmux wrapper 起動にも --brief "$BRIEF" を追加します。
+```
+
+wrapper は解決した値を Codex のプロセス単位 CLI 引数で適用します。事前検査は基礎 TOML と解決済み起動設定を検証し、モデル・強度を固定せず、`~/.codex/config.toml` を書き換えません。`codex exec -- 'prompt'` を使います。`--` より前の設定上書き引数は defaults/BRIEF の迂回を防ぐため拒否します。fast=true は `service_tier="fast"` と `features.fast_mode=true`、false は明示的に `"default"` と false に対応します。利用可否はアカウント・モデルに依存し、fast は使用量を増やす場合があります。[公式の速度説明](https://learn.chatgpt.com/docs/agent-configuration/speed)を参照してください。Hermes と `_template` は起動・設定の対応関係が未測定のため、`ADAPTER.md` で全 3 項目を N/A と明記します。Hermes は引き続き起動を拒否します。完全なインストールには `scripts/agent_defaults.py` も含まれます。
+
 ### 業務のみ BRIEF での引用
 
 ```

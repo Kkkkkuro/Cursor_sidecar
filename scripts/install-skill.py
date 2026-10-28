@@ -14,6 +14,7 @@ BUNDLE = ROOT / ".cursor/skills/Cursor_sidecar"
 # directory install; this check prevents shipping stale or partial copies.
 MIRRORS = (
     "scripts/run-agent-with-tmux-signal.py",
+    "scripts/agent_defaults.py",
     "adapters/README.md",
     "adapters/codex/ADAPTER.md",
     "adapters/codex/preflight.sh",
