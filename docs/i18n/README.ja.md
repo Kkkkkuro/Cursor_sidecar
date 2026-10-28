@@ -2,7 +2,7 @@
 
 Cursor からデバイス上の Agent CLI への安定した起動パス。
 
-<!-- Cover image (../assets/social-preview.png) lands after Art Director QC + Owner approval. Follow-up PR. -->
+![Cursor_sidecar cover](../assets/social-preview.png)
 
 **言語：** [English](../../README.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 

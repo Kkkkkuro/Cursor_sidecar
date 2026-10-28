@@ -2,7 +2,7 @@
 
 Stable launch path from Cursor to a device agent CLI.
 
-<!-- Cover image (docs/assets/social-preview.png) lands after Art Director QC + Owner approval. Follow-up PR. -->
+![Cursor_sidecar cover](docs/assets/social-preview.png)
 
 **Languages:** [English](README.md) · [简体中文](docs/i18n/README.zh-CN.md) · [日本語](docs/i18n/README.ja.md) · [한국어](docs/i18n/README.ko.md)
 

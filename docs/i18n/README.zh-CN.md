@@ -2,7 +2,7 @@
 
 从 Cursor 到设备端 Agent CLI 的稳定启动路径。
 
-<!-- Cover image (../assets/social-preview.png) lands after Art Director QC + Owner approval. Follow-up PR. -->
+![Cursor_sidecar cover](../assets/social-preview.png)
 
 **语言：** [English](../../README.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 

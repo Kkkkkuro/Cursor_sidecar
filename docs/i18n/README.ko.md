@@ -2,7 +2,7 @@
 
 Cursor에서 장치 Agent CLI로 가는 안정적인 실행 경로.
 
-<!-- Cover image (../assets/social-preview.png) lands after Art Director QC + Owner approval. Follow-up PR. -->
+![Cursor_sidecar cover](../assets/social-preview.png)
 
 **언어:** [English](../../README.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md) · [한국어](README.ko.md)
 
