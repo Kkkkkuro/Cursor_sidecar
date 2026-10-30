@@ -10,11 +10,11 @@ Cursor에서 장치 Agent CLI로 가는 안정적인 실행 경로.
 
 ## 이것이 무엇인지
 
-**Cursor_sidecar**는 같은 이름 플릿 스킬의 공개 홈입니다(이전 이름 `cursor-codex-launch`).
+Cursor에서 코드를 작성하거나 저장소를 수정하다 보면, 이 장치에 이미 설치된 Agent에게 작업을 맡겨야 할 때가 있습니다. 지금은 Codex나 Hermes를, 앞으로는 Claude, Kimi 같은 도구도 사용할 수 있습니다.
 
-Cursor(Project Shell 포함)가 장치 Agent CLI를 시작해야 할 때, 이 스킬이 공용 경로를 정합니다. **tmux 실행 셸**, **Agent별 어댑터**, **프리플라이트**, 그리고 워커가 언제 종료할지 알게 하는 **완료 벨**입니다.
+이 스킬에서는 tmux를 사용해 Cursor가 장치에 있는 Agent를 호출할 수 있게 합니다. Cursor Project Agent가 작업을 배정할 때, 그 작업이 이 skill을 통해 실행된다면 해당 작업에서 지정한 외부 Agent가 일을 맡습니다. 먼저 환경을 확인하고, 이 컴퓨터에서 Agent를 시작한 뒤, 작업이 끝나면 완료 벨로 워커에게 종료해도 된다고 알립니다. 프로젝트마다 각자의 작업에서 사용할 Agent를 선택할 수 있습니다. 예를 들어 한 저장소에서는 Codex를, 다른 저장소에서는 Hermes를 지정하면 됩니다. 선택을 생략하면 기본값은 Codex입니다.
 
-디스크 위 플릿 스킬로 존재하며, 플러그인 카탈로그 이름이 아닙니다.
+하나의 공용 경로로 여러 Agent를 다루므로 도구마다 별도의 실행 설정을 마련할 필요가 없습니다. 이곳은 같은 이름의 플릿 스킬을 위한 공개 홈입니다. 스킬은 디스크에 완전한 디렉터리로 설치되며, 플러그인 카탈로그 항목이 아닙니다.
 
 **담당 봇:** Engineering Lead · 工程师  
 **저장소:** [Kkkkkuro/Cursor_sidecar](https://github.com/Kkkkkuro/Cursor_sidecar)

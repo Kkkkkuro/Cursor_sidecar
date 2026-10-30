@@ -10,11 +10,11 @@ Stable launch path from Cursor to a device agent CLI.
 
 ## What it is
 
-**Cursor_sidecar** is the public home for the fleet skill of the same name (formerly `cursor-codex-launch`).
+When you write code or change a repo in Cursor, you sometimes need to hand the work to an agent already installed on this device — Codex or Hermes today, and later Claude, Kimi, and similar tools.
 
-When Cursor — including a Project Shell — needs to start a device agent CLI, this skill defines the shared path: a **tmux launch shell**, a **per-agent adapter**, a **preflight** gate, and a **completion bell** so the worker knows when to exit.
+In this skill, we use tmux so Cursor can call those on-device agents. When a Cursor Project Agent hands out a task, as long as the task runs through this skill, it uses the external agent you named for that task: it checks the environment first, starts the agent on this machine, and rings a completion bell when the work is done so the worker knows it can finish. Different projects can each pick their own — for example Codex in one repo and Hermes in another — by saying so in that project's tasks; omit the choice and the default is Codex.
 
-It lives on disk as a fleet skill, not as a plugin catalog entry.
+One shared path covers many agents, so you do not need a different launch setup for each tool. It is the public home for the fleet skill of the same name. It lives on disk as a complete skill directory, not as a plugin catalog entry.
 
 **Owning bot:** Engineering Lead · 工程师  
 **Repo:** [Kkkkkuro/Cursor_sidecar](https://github.com/Kkkkkuro/Cursor_sidecar)

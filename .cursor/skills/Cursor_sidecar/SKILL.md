@@ -1,16 +1,19 @@
 ---
 name: Cursor_sidecar
 description: >-
-  Use when Cursor (including a Project Shell) will start any device agent CLI
-  through an adapter and the shared tmux launch shell. Covers codex, hermes,
-  and future CLIs. A BRIEF that omits agent selection defaults to codex.
-  Stable launch path, completion bell, preflight, and the cite a business-only
-  BRIEF must include (never plugin get_skill). Formerly cursor-codex-launch.
+  Use when work on code or a repo in Cursor needs an on-device agent. Through
+  tmux, a Cursor Project Agent task that runs through this skill uses the
+  external agent named in that task. Different projects can each pick their
+  own in their tasks; omit agent selection in the BRIEF to default to codex.
+  Check the environment, start the agent locally, and ring a completion bell.
+  One shared path for Codex, Hermes, and future adapters; a complete on-disk
+  fleet skill directory, not a plugin catalog entry. Includes the required
+  business-only BRIEF cite; never plugin get_skill.
 ---
 
 # Cursor_sidecar (fleet skill)
 
-Stable call path for starting a device agent CLI from Cursor. The caller chooses the agent. This skill does not hard-code a single product as the only path.
+When you write code or change a repo in Cursor, you sometimes need to hand the work to an agent already installed on this device, such as Codex or Hermes, with Claude, Kimi, and similar tools to follow through future adapters. This skill uses tmux so Cursor can call those on-device agents. When a Cursor Project Agent hands out a task that runs through this skill, it uses the external agent named in that task: check the environment, start the agent on this machine, and ring a completion bell so the worker knows it can finish. Different projects can each pick their own agent in their tasks, such as Codex in one repo and Hermes in another; omit agent selection in the BRIEF and the default is Codex. One shared launch path covers many agents. This is the public home for the fleet skill of the same name, installed on disk as a complete skill directory, not a plugin catalog entry.
 
 Authority is the Shared completion bell, then machine `grokbot-cursor-standing-orders` **#19** and **#23** (and the matching hard rules in the Cursor dispatch template). This skill does not restate Shared. If wording conflicts, Shared wins, then SO #19 and SO #23.
 
