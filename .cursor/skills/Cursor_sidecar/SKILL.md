@@ -1,16 +1,18 @@
 ---
 name: Cursor_sidecar
 description: >-
-  Use when Cursor (including a Project Shell) will start any device agent CLI
-  through an adapter and the shared tmux launch shell. Covers codex, hermes,
-  and future CLIs. A BRIEF that omits agent selection defaults to codex.
-  Stable launch path, completion bell, preflight, and the cite a business-only
-  BRIEF must include (never plugin get_skill). Formerly cursor-codex-launch.
+  Lets Cursor call any agent CLI installed on the current device through one
+  shared launch path: Codex, Hermes, and (once you add an adapter) Claude, Kimi,
+  and similar tools. Use when Cursor (including a Project Shell) needs an agent
+  to do the work: pick it in the BRIEF, run preflight, start it in a tmux shell,
+  and wait on a completion bell. A BRIEF that omits agent selection defaults to
+  codex. Includes the required business-only BRIEF cite; never plugin get_skill.
+  Formerly cursor-codex-launch.
 ---
 
 # Cursor_sidecar (fleet skill)
 
-Stable call path for starting a device agent CLI from Cursor. The caller chooses the agent. This skill does not hard-code a single product as the only path.
+**Cursor_sidecar** lets Cursor call any agent CLI installed on the current device, including Codex, Hermes, and (once you add an adapter) Claude, Kimi, and similar tools, through one shared launch path. When Cursor (including a Project Shell) needs an agent to do the work, pick it in the BRIEF, run preflight, start it in a tmux shell, and wait on a completion bell so the worker knows when to exit.
 
 Authority is the Shared completion bell, then machine `grokbot-cursor-standing-orders` **#19** and **#23** (and the matching hard rules in the Cursor dispatch template). This skill does not restate Shared. If wording conflicts, Shared wins, then SO #19 and SO #23.
 

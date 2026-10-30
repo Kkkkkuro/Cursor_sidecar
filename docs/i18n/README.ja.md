@@ -10,11 +10,11 @@ Cursor からデバイス上の Agent CLI への安定した起動パス。
 
 ## これは何か
 
-**Cursor_sidecar** は、同名のフリート技能の公開ホームです（旧称 `cursor-codex-launch`）。
+**Cursor_sidecar** を使うと、Cursor から**このデバイスにインストール済み**の任意の Agent CLI を、ひとつの共通起動パスで呼び出せます。Codex、Hermes に加え、アダプタを追加すれば Claude、Kimi なども同じパスで利用できます。
 
-Cursor（Project Shell を含む）がデバイス上の Agent CLI を起動する必要があるとき、この技能が共有パスを定義します。**tmux 起動シェル**、**Agent ごとのアダプタ**、**プリフライト**、そしてワーカーが終了タイミングを知るための **完了ベル** です。
+Cursor（Project Shell を含む）から Agent に作業を任せたいときは、この技能を使います。BRIEF で Agent を選び、プリフライトを実行し、tmux シェルで起動して完了ベルを待ちます。これにより、ワーカーは終了するタイミングを判断できます。
 
-ディスク上のフリート技能として存在し、プラグインカタログの名前ではありません。
+同名のフリート技能の公開ホームです（旧称 `cursor-codex-launch`）。ディスク上に完全な技能ディレクトリとして配置され、プラグインカタログの項目ではありません。
 
 **担当ボット：** Engineering Lead · 工程师  
 **リポジトリ：** [Kkkkkuro/Cursor_sidecar](https://github.com/Kkkkkuro/Cursor_sidecar)

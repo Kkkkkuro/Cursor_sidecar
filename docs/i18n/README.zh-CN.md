@@ -10,11 +10,11 @@
 
 ## 这是什么
 
-**Cursor_sidecar** 是同名舰队技能的公开主页（前称 `cursor-codex-launch`）。
+**Cursor_sidecar** 让 Cursor 能调用**本机已安装**的任意 Agent CLI——Codex、Hermes，以及按同样适配器接上后的 Claude、Kimi 等——走同一套启动路径。
 
-当 Cursor（含 Project Shell）需要启动设备端 Agent CLI 时，本技能规定共用路径：**tmux 启动壳**、**按 Agent 的适配器**、**预检门**，以及让 worker 知道何时退出的 **完成铃**。
+当 Cursor（含 Project Shell）需要这些 Agent 干活时，用本技能：在派工要点里选定 Agent，预检通过后经 tmux 启动壳拉起，并用完成铃让 worker 知道何时退出。
 
-它以磁盘上的舰队技能形式存在，不是插件目录里的名字。
+它是同名舰队技能的公开主页（前称 `cursor-codex-launch`），以完整技能目录形式落在磁盘上，不是插件目录里的名字。
 
 **负责 Bot：** Engineering Lead · 工程师  
 **仓库：** [Kkkkkuro/Cursor_sidecar](https://github.com/Kkkkkuro/Cursor_sidecar)
