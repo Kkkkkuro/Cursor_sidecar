@@ -134,6 +134,7 @@ Omit both to default to codex.
 
 ## 이것이 아닌 것
 
+- **온디바이스 CLI 전용**: 이 스킬은 tmux + 로컬 adapters로 이 기기의 agent CLI를 실행합니다. Cursor Cloud Agent / Background Agent 실행 경로는 제공하지 않습니다. 클라우드 작업에는 Cursor 기본 Cloud / Project를 사용하세요.
 - **Cursor Marketplace 스킬이 아님** — Owner가 그 게시를 지정하지 않는 한 올리지 않음.
 - **GBrain / 플러그인 `get_skill` 등록 이름이 아님** — 그 카탈로그에 이 이름을 넣지 않음.
 - **KM 소유 GBrain 래퍼 본문을 다시 쓸 권한이 아님**(`templates/run-codex-with-tmux-signal.py`). 파일 보존은 비준수 pin 실행 허가가 아닙니다. 실행 전 SO19 게이트가 필요합니다: 현재 SHA256에 연결된 정상 반환 및 강제 타임아웃 증거, 해당 종료 파일의 동일 내용과 신호 전 기록, `TMUX_BIN`을 따르는 절대 tmux 경로, 유한 대기, 다중 행 `send-keys` 없음. 증거가 없거나 실패하면 `STATUS: STUCK`입니다. 완전한 스킬의 wrapper로 실행 계획을 전환하고 프리플라이트와 스모크를 다시 실행합니다. 정확한 고정 경로가 필수이면 KM/Owner가 해결할 때까지 멈춥니다. KM 본문은 수정하지 않습니다.

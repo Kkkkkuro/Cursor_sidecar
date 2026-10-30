@@ -134,6 +134,7 @@ Omit both to default to codex.
 
 ## これは何かではない
 
+- **オンデバイス CLI 専用**：このスキルは tmux + ローカル adapters を通じて、この端末の agent CLI を起動する。Cursor Cloud Agent / Background Agent の起動には対応しない。クラウド作業には Cursor ネイティブの Cloud / Project を使う。
 - **Cursor Marketplace 技能ではない** — Owner がその公開を指名しない限り載せない。
 - **GBrain / プラグイン `get_skill` の登録名ではない** — それらのカタログにこの名前を足さない。
 - **KM 所有の GBrain ラッパー本文を書き換える許可ではない**（`templates/run-codex-with-tmux-signal.py`）。ファイルの保持は不適合な pin の実行許可ではない。起動前に SO19 ゲートを満たすこと：現在の SHA256 に対応する正常終了・強制タイムアウト両方の証拠、該当する終了ファイルの同一内容と信号前の書き込み、`TMUX_BIN` に従う絶対 tmux パス、有界の待機、複数行 `send-keys` なし。証拠不足・不適合なら `STATUS: STUCK`。完全な技能内の wrapper に起動計画を変更してプリフライトとスモークを再実行する。固定パスが必須なら KM/Owner に委ねて停止を維持する。KM 本文は書き換えない。

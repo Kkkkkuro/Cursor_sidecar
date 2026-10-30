@@ -159,6 +159,7 @@ Dispatchers keep the full paste in the Cursor dispatch template hard rules 7 and
 
 ## Anti-jobs
 
+- On-device CLI only (tmux + local adapters); do not use this skill to launch Cursor Cloud Agent / Background Agent. Use native Cursor Cloud / Project for cloud work.
 - Do not publish this as a Cursor Marketplace or plugin skill unless the Owner names that publish.
 - Do not register it in a GBrain plugin `get_skill` catalog.
 - Do not rewrite the KM-owned GBrain wrapper body from this skill.
