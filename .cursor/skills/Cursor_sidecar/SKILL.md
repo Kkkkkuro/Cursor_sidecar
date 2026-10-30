@@ -1,18 +1,19 @@
 ---
 name: Cursor_sidecar
 description: >-
-  Lets Cursor call any agent CLI installed on the current device through one
-  shared launch path: Codex, Hermes, and (once you add an adapter) Claude, Kimi,
-  and similar tools. Use when Cursor (including a Project Shell) needs an agent
-  to do the work: pick it in the BRIEF, run preflight, start it in a tmux shell,
-  and wait on a completion bell. A BRIEF that omits agent selection defaults to
-  codex. Includes the required business-only BRIEF cite; never plugin get_skill.
-  Formerly cursor-codex-launch.
+  Use when work on code or a repo in Cursor needs an on-device agent. Through
+  tmux, a Cursor Project Agent task that runs through this skill uses the
+  external agent named in that task. Different projects can each pick their
+  own in their tasks; omit agent selection in the BRIEF to default to codex.
+  Check the environment, start the agent locally, and ring a completion bell.
+  One shared path for Codex, Hermes, and future adapters; a complete on-disk
+  fleet skill directory, not a plugin catalog entry. Includes the required
+  business-only BRIEF cite; never plugin get_skill.
 ---
 
 # Cursor_sidecar (fleet skill)
 
-**Cursor_sidecar** lets Cursor call any agent CLI installed on the current device, including Codex, Hermes, and (once you add an adapter) Claude, Kimi, and similar tools, through one shared launch path. When Cursor (including a Project Shell) needs an agent to do the work, pick it in the BRIEF, run preflight, start it in a tmux shell, and wait on a completion bell so the worker knows when to exit.
+When you write code or change a repo in Cursor, you sometimes need to hand the work to an agent already installed on this device, such as Codex or Hermes, with Claude, Kimi, and similar tools to follow through future adapters. This skill uses tmux so Cursor can call those on-device agents. When a Cursor Project Agent hands out a task that runs through this skill, it uses the external agent named in that task: check the environment, start the agent on this machine, and ring a completion bell so the worker knows it can finish. Different projects can each pick their own agent in their tasks, such as Codex in one repo and Hermes in another; omit agent selection in the BRIEF and the default is Codex. One shared launch path covers many agents. This is the public home for the fleet skill of the same name, installed on disk as a complete skill directory, not a plugin catalog entry.
 
 Authority is the Shared completion bell, then machine `grokbot-cursor-standing-orders` **#19** and **#23** (and the matching hard rules in the Cursor dispatch template). This skill does not restate Shared. If wording conflicts, Shared wins, then SO #19 and SO #23.
 
