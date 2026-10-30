@@ -134,6 +134,7 @@ Omit both to default to codex.
 
 ## 这不是什么
 
+- **仅限本机 CLI**：本技能通过 tmux + 本机 adapters 启动本机 agent CLI，不提供 Cursor Cloud Agent / Background Agent 启动路径；云端任务请使用 Cursor 原生 Cloud / Project。
 - **不是** Cursor Marketplace 技能 — 除非 Owner 点名发布，否则不要上架。
 - **不是** GBrain / 插件 `get_skill` 注册名 — 不要把这个名字写进那些目录。
 - **不是** 重写 KM 持有的 GBrain wrapper 正文的许可（`templates/run-codex-with-tmux-signal.py`）。保留文件不代表可以继续运行不合规 pin。启动前必须通过技能的 SO19 合规门：绑定当前 SHA256 的正常返回和超时双路径证据，三个适用退出文件内容一致且先写后信号，使用绝对 tmux 并遵守 `TMUX_BIN`，等待有界且无多行 `send-keys`。缺证据或不合规则 `STATUS: STUCK`；启动方案改用完整技能内的 wrapper 并重新预检/冒烟；必须使用原路径的任务留给 KM/Owner 处理。不得重写 KM wrapper。

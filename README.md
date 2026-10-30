@@ -152,6 +152,7 @@ Once `RUN_DIR` has a RECEIPT whose first STATUS line is `STATUS: FIXED` or `STAT
 
 ## What this is not
 
+- **On-device CLI only:** this skill uses tmux + local adapters to launch agent CLIs on this device. It is **not** a Cursor Cloud Agent / Background Agent launch path; use native Cursor Cloud / Project for cloud work.
 - **Not** a Cursor Marketplace skill — do not publish there unless the Owner names that publish.
 - **Not** a GBrain / plugin `get_skill` registration — do not add this name to those catalogs.
 - **Not** a license to rewrite the KM-owned GBrain wrapper body (`templates/run-codex-with-tmux-signal.py`). Pinned jobs keep the file and must pass the SO19 conformance gate before using it.
