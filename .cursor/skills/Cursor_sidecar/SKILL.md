@@ -57,7 +57,7 @@ The BRIEF selects the adapter for this job.
 
 Several agents use several tmux sessions. Each agent gets its own session name, its own signal, and its own subdirectory of `RUN_DIR`. Each session has one completion bell. Do not put unrelated CLIs in one pane.
 
-Sequential: start the next session only after the previous signal arrives. Parallel: start the sessions together and wait on each signal with its own waiter. See `docs/architecture.md`.
+Independent sessions default to **Parallel**: start the sessions together and wait on each signal with its own waiter (Owner t3505u / t3508; align Shared R18). Use **Sequential** (start the next session only after the previous signal arrives) only when sessions share a lock or edit the same files. See `docs/architecture.md`.
 
 ## First-run defaults and job overrides
 
